@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel</title>
+</head>
+
+<body style="background:black;color:white;text-align:center;">
+
+<h2>Admin Login</h2>
+
+<input type="text" id="id" placeholder="ID"><br>
+<input type="password" id="pass" placeholder="Password"><br>
+<button onclick="login()">Login</button>
+
+<div id="panel" style="display:none;">
+<h2>All Requests</h2>
+<div id="data"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAih1IOJg6HGLEsEakB8Layx_MfzPS4xN8",
+  authDomain: "cinestream-a7c68.firebaseapp.com",
+  projectId: "cinestream-a7c68",
+  storageBucket: "cinestream-a7c68.firebasestorage.app",
+  messagingSenderId: "164631357027",
+  appId: "1:164631357027:web:d2abf0d83b5e58112efa56"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function login(){
+let id = document.getElementById("id").value;
+let pass = document.getElementById("pass").value;
+
+if(id==="deepakmali698" && pass==="Admin@456"){
+document.getElementById("panel").style.display="block";
+loadData();
+} else {
+alert("Wrong Login");
+}
+}
+
+function loadData(){
+db.collection("requests").get().then(snapshot=>{
+let html="";
+snapshot.forEach(doc=>{
+let d = doc.data();
+
+html += `
+<div style="border:1px solid white;margin:10px;padding:10px;">
+ID: ${doc.id}<br>
+Movie: ${d.movie}<br>
+Quality: ${d.quality}<br>
+Contact: ${d.contact} - ${d.info}<br>
+Status: ${d.status}<br>
+
+<select onchange="updateStatus('${doc.id}', this.value)">
+<option>Pending</option>
+<option>Completed</option>
+<option>Sent</option>
+</select>
+</div>
+`;
+});
+document.getElementById("data").innerHTML = html;
+});
+}
+
+function updateStatus(id, status){
+db.collection("requests").doc(id).update({status});
+}
+</script>
+
+</body>
+</html>
